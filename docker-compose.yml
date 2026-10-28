@@ -1,0 +1,50 @@
+
+services:
+
+  database:
+    image: postgres:16-alpine
+    container_name: sportscoaching-database
+    environment:
+      POSTGRES_DB: exam_2400031987
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "Pooja@123"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d exam_2400031987"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    build:
+      context: ./SportsCoachingBatch
+      dockerfile: Dockerfile
+    container_name: sportscoaching-backend
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/exam_2400031987
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "Pooja@123"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      EUREKA_CLIENT_ENABLED: "false"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./SportsCoaching-Frontend
+      dockerfile: Dockerfile
+    container_name: sportscoaching-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

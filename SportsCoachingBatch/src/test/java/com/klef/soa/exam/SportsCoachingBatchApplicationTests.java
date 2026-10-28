@@ -1,4 +1,4 @@
-package com.klef.soa.exam;
+package com.klef.soa.docker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
